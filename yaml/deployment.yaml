@@ -66,7 +66,7 @@ spec:
         resources: {}
         env:
         - name: SERVICES
-          value: services/**/*.agent.js
+          value: services/**/ftp.server.agent.js
         - name: LOGLEVEL
           value: "debug"
         envFrom:
