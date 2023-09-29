@@ -144,7 +144,7 @@ module.exports = {
         async createFTPServer() {
             const resolverFunction = (address) => {
                 console.log(address)
-                return "ftp.one-host.ca";
+                return "127.0.0.1";
             }
             const ftpConfig = {
                 url: this.config['ftp.url'],
@@ -155,6 +155,7 @@ module.exports = {
                 greeting: this.config['ftp.greeting'],
                 anonymous: this.config['ftp.anonymous'],
             };
+
 
             const ftpServer = new FtpSrv(ftpConfig);
 
