@@ -142,10 +142,13 @@ module.exports = {
          * @returns {Promise}
          */
         async createFTPServer() {
-
+            const resolverFunction = (address) => {
+                
+                return "ftp.one-host.ca";
+             }
             const ftpConfig = {
                 url: this.config['ftp.url'],
-                pasv_url: this.config['ftp.pasv_url'],
+                pasv_url: resolverFunction,
                 pasv_min: this.config['ftp.pasv_min'],
                 pasv_max: this.config['ftp.pasv_max'],
                 greeting: this.config['ftp.greeting'],

@@ -126,7 +126,7 @@ module.exports = {
                     required: true,
                     message: `Permissions must be one of ${FTP_EVENTS.join(', ')}`
                 },
-                default: [],
+                default: FTP_EVENTS.filter(e => e[0] !== '!'),
             },
             // ftp quota
             quota: {
@@ -264,6 +264,7 @@ module.exports = {
             if (!res)
                 throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS_PASSWORD");
 
+            console.log(user)
             return user;
         },
 
