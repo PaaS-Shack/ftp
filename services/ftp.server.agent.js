@@ -148,7 +148,7 @@ module.exports = {
              }
             const ftpConfig = {
                 url: this.config['ftp.url'],
-                pasv_url: resolverFunction,
+               // pasv_url: resolverFunction,
                 pasv_min: this.config['ftp.pasv_min'],
                 pasv_max: this.config['ftp.pasv_max'],
                 greeting: this.config['ftp.greeting'],
