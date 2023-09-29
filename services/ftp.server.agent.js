@@ -238,7 +238,7 @@ module.exports = {
                     resolve({
                         fs: fileSystem,
                         blacklist,
-                        whitelist,
+                       // whitelist,
                     });
                 }).catch((error) => {
                     // reject
