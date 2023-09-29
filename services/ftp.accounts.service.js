@@ -256,13 +256,13 @@ module.exports = {
                 scope: '-membership'
             });
             if (!user)
-                throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS");
+                throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS_USER");
 
             // check password
             const res = await this.comparePassword(password, user.password);
 
             if (!res)
-                throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS");
+                throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS_PASSWORD");
 
             return user;
         },
