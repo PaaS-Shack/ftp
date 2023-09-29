@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ftptd
+  namespace: paas-shack
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: ftptd
+  template:
+    metadata:
+      labels:
+        app: ftptd
+    spec:
+      containers:
+      - image: gcr.io/fid-sql/ftp:td
+        imagePullPolicy: Always
+        name: ftptd
+        resources: {}
+        ports:
+        - containerPort: 18021
+          protocol: TCP
+        - containerPort: 18022
+          protocol: TCP
+        - containerPort: 18101
+          protocol: TCP
+        - containerPort: 18102
+          protocol: TCP
+        - containerPort: 18103
+          protocol: TCP
+        - containerPort: 18104
+          protocol: TCP   
+        envFrom:
+          - configMapRef:
+              name: config
+          - secretRef:
+              name: secrets

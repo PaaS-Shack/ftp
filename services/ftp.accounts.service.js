@@ -63,7 +63,9 @@ module.exports = {
      * @property {ConfigLoader} ConfigLoader - Config loader mixin
      */
     mixins: [
-        DbService({}),
+        DbService({
+            permissions: 'ftp.accounts'
+        }),
         ConfigLoader(['ftp.**']),
         Membership({
             permissions: 'ftp.accounts'
@@ -123,7 +125,8 @@ module.exports = {
                     enum: FTP_EVENTS,
                     required: true,
                     message: `Permissions must be one of ${FTP_EVENTS.join(', ')}`
-                }
+                },
+                default: [],
             },
             // ftp quota
             quota: {
@@ -203,6 +206,7 @@ module.exports = {
             },
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
+                this.logger.info('login', params);
                 return this.login(ctx, params.username, params.password);
             }
         },
@@ -249,8 +253,9 @@ module.exports = {
          */
         async login(ctx, username, password) {
             // lookup username  
-            const user = await this.findEntity(null, {
+            const user = await this.findEntity(ctx, {
                 query: { username },
+
             });
             if (!user)
                 throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS");

@@ -4,7 +4,7 @@ const { Context } = require("moleculer");
 const ConfigLoader = require("config-mixin");
 const { MoleculerClientError } = require("moleculer").Errors;
 
-const { FtpSrv } = require('ftp-srv');
+const { FtpSrv, FileSystem } = require('ftp-srv');
 
 const { LocalFileSystem } = require('../fs/local');
 
@@ -95,7 +95,34 @@ module.exports = {
      * service actions
      */
     actions: {
+        /**
+         * list open connections
+         * 
+         * @actions
+         * 
+         * @returns {Promise} - list of open connections
+         */
+        listOpenConnections: {
+            rest: {
+                method: 'GET',
+                path: '/connections'
+            },
+            permissions: ['ftp.server.connections.list'],
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+                // get connections
+                const connections = this.server.connections;// connections is a object
 
+                return Object.keys(connections).map((key) => {
+                    const connection = connections[key];
+                    return {
+                        ip: connection.ip,
+                        remoteAddress: connection.commandSocket.remoteAddress,
+                        user: connection.user,
+                    }
+                });
+            }
+        },
     },
 
     /**
@@ -149,7 +176,7 @@ module.exports = {
             ftpServer.listen(() => {
                 this.logger.info(`FTP server listening on ${ftpConfig.url}`);
             });
-            
+
             ftpServer.on('close', () => {
                 this.logger.info(`FTP server closed`);
             });
@@ -171,6 +198,7 @@ module.exports = {
                             resolve();
                         }
                     });
+                    resolve();
                 } else {
                     resolve();
                 }
@@ -196,15 +224,15 @@ module.exports = {
                     // set user
                     connection.user = user;
 
+                    // get user blacklist and whitelist
                     const blacklist = await this.getUserBlacklist(user);
                     const whitelist = await this.getUserWhitelist(user);
 
+                    // create fs driver
                     const fileSystem = await this.createFsDriver(connection, user);
 
                     // resolve
                     resolve({
-                        user,
-                        connection,
                         fs: fileSystem,
                         blacklist,
                         whitelist,
@@ -248,11 +276,13 @@ module.exports = {
                     this.logger.info(`FTP user ${connection.user?.username} ${cmd} ${filePath}`);
                 }
             }
+
             for (const event of FTP_EVENTS) {
                 if (event.startsWith('!')) {
                     // skip blacklisted events
                     continue;
                 }
+                console.log(event)
                 // attach events
                 connection.on(event, logFunction(event));
             }
@@ -297,7 +327,10 @@ module.exports = {
          */
         async createLocalFsDriver(connection, user) {
             // create local driver
-            const fs = new LocalFileSystem(connection, user);
+            this.logger.info(`Creating local fs driver for ${user.username} for path ${user.homedir}`);
+            const fs = new FileSystem(connection, {
+                root: user.homedir
+            });
             // return new driver
             return fs;
         },
@@ -313,6 +346,8 @@ module.exports = {
             // filter user blacklist from user.permissions
             return user.permissions.filter((permission) => {
                 return permission.startsWith('!');
+            }).map((permission) => {
+                return permission.substring(1);
             });
         },
 
