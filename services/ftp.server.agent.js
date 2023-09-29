@@ -145,10 +145,11 @@ module.exports = {
             const resolverFunction = (address) => {
                 console.log(address)
                 return "ftp.one-host.ca";
-             }
+            }
             const ftpConfig = {
                 url: this.config['ftp.url'],
-               // pasv_url: resolverFunction,
+                pasv_url: resolverFunction,
+                log: this.logger,
                 pasv_min: this.config['ftp.pasv_min'],
                 pasv_max: this.config['ftp.pasv_max'],
                 greeting: this.config['ftp.greeting'],
@@ -238,7 +239,7 @@ module.exports = {
                     resolve({
                         fs: fileSystem,
                         blacklist,
-                       // whitelist,
+                        // whitelist,
                     });
                 }).catch((error) => {
                     // reject
