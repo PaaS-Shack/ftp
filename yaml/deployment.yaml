@@ -4,39 +4,43 @@ metadata:
   name: ftptd
   namespace: paas-shack
 spec:
-  externalTrafficPolicy: Local
+  externalIPs:
+  - 
   ports:
-  - name: port-1
-    port: 18021
+  - name: port-21
+    port: 21
     protocol: TCP
-    targetPort: 18021
-  - name: port-2
-    port: 18022
+  - name: port-45000
+    port: 45000
     protocol: TCP
-    targetPort: 18022
-  - name: port-3
-    port: 18101
+  - name: port-45001
+    port: 45001
     protocol: TCP
-    targetPort: 18101
-  - name: port-4
-    port: 18102
+  - name: port-45002
+    port: 45002
     protocol: TCP
-    targetPort: 18102
-  - name: port-5
-    port: 18103
+  - name: port-45003
+    port: 45003
     protocol: TCP
-    targetPort: 18103
-  - name: port-6
-    port: 18104
+  - name: port-45004
+    port: 45004
     protocol: TCP
-    targetPort: 18104
+  - name: port-45005
+    port: 45005
+    protocol: TCP
+  - name: port-45006
+    port: 45006
+    protocol: TCP
+  - name: port-45007
+    port: 45007
+    protocol: TCP
+  - name: port-45008
+    port: 45008
+    protocol: TCP
+  - name: port-45009
+    port: 45009
   selector:
     app: ftptd
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
-  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,31 +54,72 @@ spec:
   selector:
     matchLabels:
       app: ftptd
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
         app: ftptd
     spec:
       containers:
-      - image: gcr.io/fid-sql/ftp:td
+      - envFrom:
+        - configMapRef:
+            name: config
+        - secretRef:
+            name: secrets
+        image: ghcr.io/paas-shack/ftp:main
         imagePullPolicy: Always
         name: ftptd
-        resources: {}
         ports:
-        - containerPort: 18021
+        - name: port-21
+          containerPort: 21
           protocol: TCP
-        - containerPort: 18022
+        - name: port-45000
+          containerPort: 45000
           protocol: TCP
-        - containerPort: 18101
+        - name: port-45001
+          containerPort: 45001
           protocol: TCP
-        - containerPort: 18102
+        - name: port-45002
+          containerPort: 45002
           protocol: TCP
-        - containerPort: 18103
+        - name: port-45003
+          containerPort: 45003
           protocol: TCP
-        - containerPort: 18104
-          protocol: TCP   
+        - name: port-45004
+          containerPort: 45004
+          protocol: TCP
+        - name: port-45005
+          containerPort: 45005
+          protocol: TCP
+        - name: port-45006
+          containerPort: 45006
+          protocol: TCP
+        - name: port-45007
+          containerPort: 45007
+          protocol: TCP
+        - name: port-45008
+          containerPort: 45008
+          protocol: TCP
+        - name: port-45009
+          containerPort: 45009 
+        resources: {}
+        env:
+        - name: SERVICES
+          value: services/**/*.service.js
         envFrom:
-          - configMapRef:
-              name: config
-          - secretRef:
-              name: secrets
+        - configMapRef:
+            name: config
+        - secretRef:
+            name: secrets
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

@@ -188,8 +188,6 @@ module.exports = {
      * service actions
      */
     actions: {
-        ...DbService.ACTIONS,// inject dbservice actions
-        ...Membership.ACTIONS,// inject membership actions
         /**
          * FTP user login action
          * 
