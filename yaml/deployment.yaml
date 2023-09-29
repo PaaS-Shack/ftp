@@ -67,8 +67,8 @@ spec:
         env:
         - name: SERVICES
           value: services/**/*.agent.js
-        - name: DEBUG
-          value: "*"
+        - name: LOGLEVEL
+          value: "debug"
         envFrom:
         - configMapRef:
             name: config

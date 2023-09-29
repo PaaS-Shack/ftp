@@ -4,7 +4,7 @@ const { Context } = require("moleculer");
 const ConfigLoader = require("config-mixin");
 const { MoleculerClientError } = require("moleculer").Errors;
 
-const { FtpSrv, FileSystem } = require('ftp-srv');
+const { FtpSrv, FileSystem } = require('../lib');
 
 const { LocalFileSystem } = require('../fs/local');
 
