@@ -143,7 +143,7 @@ module.exports = {
          */
         async createFTPServer() {
             const resolverFunction = (address) => {
-                
+                console.log(address)
                 return "ftp.one-host.ca";
              }
             const ftpConfig = {
