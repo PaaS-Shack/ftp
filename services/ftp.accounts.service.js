@@ -253,7 +253,7 @@ module.exports = {
             // lookup username  
             const user = await this.findEntity(ctx, {
                 query: { username },
-
+                scope: '-membership'
             });
             if (!user)
                 throw new MoleculerClientError("Invalid credentials", 401, "INVALID_CREDENTIALS");
@@ -289,6 +289,7 @@ module.exports = {
         async findByName(username) {
             return this.findEntity(null, {
                 query: { username },
+                scope: '-membership'
             });
         },
     },
