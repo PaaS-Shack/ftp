@@ -41,6 +41,7 @@ const FTP_EVENTS = [
 // blacklist of ftp commands
 const eventLenth = FTP_EVENTS.length;
 for (let i = 0; i < eventLenth; i++) {
+    const event = FTP_EVENTS[i];
     FTP_EVENTS.push(`!${event}`)
 }
 

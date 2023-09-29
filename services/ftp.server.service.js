@@ -43,6 +43,7 @@ const FTP_EVENTS = [
 // blacklist of ftp commands
 const eventLenth = FTP_EVENTS.length;
 for (let i = 0; i < eventLenth; i++) {
+    const event = FTP_EVENTS[i];
     FTP_EVENTS.push(`!${event}`)
 }
 
@@ -87,7 +88,6 @@ module.exports = {
             'ftp.pasv_max': 30009,
             'ftp.greeting': 'Welcome to FTP server',
             'ftp.anonymous': false,
-
         }
     },
 
@@ -146,6 +146,13 @@ module.exports = {
             });
 
 
+            ftpServer.listen(() => {
+                this.logger.info(`FTP server listening on ${ftpConfig.url}`);
+            });
+            
+            ftpServer.on('close', () => {
+                this.logger.info(`FTP server closed`);
+            });
 
         },
 
@@ -261,7 +268,7 @@ module.exports = {
          * 
          * @returns {Promise} fs driver object
          */
-        async createFsDriver(connection, user) {
+        async createFsDriver(connection, _user) {
             // get user
             const user = connection.user;
 
@@ -333,13 +340,15 @@ module.exports = {
      * Service started lifecycle event handler
      */
     started() {
-
+        return this.createFTPServer();
     },
 
     /**
      * Service stopped lifecycle event handler
      */
-    stopped() { }
+    stopped() {
+        return this.stopFTPServer();
+    }
 
 }
 
