@@ -66,7 +66,9 @@ module.exports = {
         DbService({
             permissions: 'ftp.accounts'
         }),
-        ConfigLoader(['ftp.**']),
+        ConfigLoader([
+            'ftp.**'
+        ]),
         Membership({
             permissions: 'ftp.accounts'
         })

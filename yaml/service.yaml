@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ftptd
+  name: ftp
   namespace: paas-shack
 spec:
   externalIPs:
@@ -51,4 +51,4 @@ spec:
     port: 45009
     targetPort: 45009
   selector:
-    app: ftptd
+    app: ftp

@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ftptd
+  name: ftp
   namespace: paas-shack
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
-  revisionHistoryLimit: 10
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
-      app: ftptd
+      app: ftp
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -19,7 +19,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: ftptd
+        app: ftp
     spec:
       containers:
       - envFrom:
@@ -27,9 +27,9 @@ spec:
             name: config
         - secretRef:
             name: secrets
-        image: ghcr.io/paas-shack/ftp:main
+        image: ghcr.io/paas-shack/ftp@sha256:8cb98e4f2b5fd2c5f9a5e7c13c862519ee052691f1e60869e266dd731d9a1118 
         imagePullPolicy: Always
-        name: ftptd
+        name: ftp
         ports:
         - name: port-21
           containerPort: 21
@@ -66,9 +66,7 @@ spec:
         resources: {}
         env:
         - name: SERVICES
-          value: services/**/ftp.server.agent.js
-        - name: LOGLEVEL
-          value: "debug"
+          value: services/**/*.js
         envFrom:
         - configMapRef:
             name: config

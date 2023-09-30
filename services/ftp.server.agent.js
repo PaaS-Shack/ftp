@@ -142,13 +142,11 @@ module.exports = {
          * @returns {Promise}
          */
         async createFTPServer() {
-            const resolverFunction = (address) => {
-                console.log(address)
-                return this.config['ftp.pasv_url'];
-            }
+            
+            // ftp config
             const ftpConfig = {
                 url: this.config['ftp.url'],
-                pasv_url: resolverFunction,
+                pasv_url: this.config['ftp.pasv_url'],
                 log: this.logger,
                 pasv_min: this.config['ftp.pasv_min'],
                 pasv_max: this.config['ftp.pasv_max'],
@@ -156,7 +154,6 @@ module.exports = {
                 anonymous: this.config['ftp.anonymous'],
             };
 
-            
             const ftpServer = new FtpSrv(ftpConfig);
 
             this.server = ftpServer;
@@ -177,13 +174,12 @@ module.exports = {
                 this.handleConnection(connection);
             });
 
+            ftpServer.on('close', () => {
+                this.logger.info(`FTP server closed`);
+            });
 
             ftpServer.listen(() => {
                 this.logger.info(`FTP server listening on ${ftpConfig.url}`);
-            });
-
-            ftpServer.on('close', () => {
-                this.logger.info(`FTP server closed`);
             });
 
         },
@@ -287,13 +283,12 @@ module.exports = {
                     // skip blacklisted events
                     continue;
                 }
-                console.log(event)
+                
                 // attach events
                 connection.on(event, logFunction(event));
             }
 
         },
-
 
         /**
          * Create fs driver object
