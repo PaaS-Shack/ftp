@@ -313,8 +313,4 @@ module.exports = {
      * Service stopped lifecycle event handler
      */
     stopped() { }
-
-}
-
-
-
+};
