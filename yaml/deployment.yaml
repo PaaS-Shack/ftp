@@ -74,8 +74,22 @@ spec:
             name: secrets
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:
+        - name: nfs-server-0
+          mountPath: /mnt/nfs-0
+        - name: nfs-server-1
+          mountPath: /mnt/nfs-1
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+      - name: nfs-server-0
+        nfs:
+          server: "nfs-server-0.nfs-server.storage.svc.cloud.one-host.ca"
+          path: "/"
+      - name: nfs-server-1
+        nfs:
+          server: "nfs-server-1.nfs-server.storage.svc.cloud.one-host.ca"
+          path: "/"
