@@ -142,7 +142,7 @@ module.exports = {
          * @returns {Promise}
          */
         async createFTPServer() {
-            
+
             // ftp config
             const ftpConfig = {
                 url: this.config['ftp.url'],
@@ -240,7 +240,9 @@ module.exports = {
                     });
                 }).catch((error) => {
                     // reject
-                    reject(error);
+                    setTimeout(() => {
+                        reject(error);
+                    }, 1000);
                 });
 
         },
@@ -283,7 +285,7 @@ module.exports = {
                     // skip blacklisted events
                     continue;
                 }
-                
+
                 // attach events
                 connection.on(event, logFunction(event));
             }
