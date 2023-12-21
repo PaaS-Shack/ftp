@@ -228,6 +228,49 @@ module.exports = {
                 return this.findByName(params.username);
             }
         },
+
+        /**
+         * Create FTP user from storage provision
+         * 
+         * @actions
+         * @param {String} username - FTP username
+         * @param {String} password - FTP password
+         * @param {String} provision - storage provision id
+         * 
+         * @returns {Object} FTP user
+         */
+        createFromProvision: {
+            rest: {
+                method: "POST",
+                path: "/provision",
+            },
+            params: {
+                username: { type: "string", min: 3, max: 32, required: true },
+                password: { type: "string", min: 8, max: 64, required: true },
+                provision: { type: "string", min: 3, max: 32, required: true },
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+
+                const provision = await this.broker.call('v1.storage.provisions.get', { id: params.provision });
+                if (!provision)
+                    throw new MoleculerClientError("Invalid provision", 400, "INVALID_PROVISION");
+
+                const user = await this.findByName(params.username);
+                if (user)
+                    throw new MoleculerClientError("User already exists", 400, "USER_EXISTS");
+
+                const data = {
+                    username: params.username,
+                    password: params.password,
+                    homedir:`/mnt/${provision.path}`,
+                    quota: 0,
+                    ratio: 0,
+                };
+
+                return this.createEntity(ctx, data);
+            }
+        },
     },
 
     /**
