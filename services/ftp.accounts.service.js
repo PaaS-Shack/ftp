@@ -91,7 +91,7 @@ module.exports = {
             // ftp username
             username: {
                 type: "string",
-                min: 4,
+                min: 3,
                 max: 32,
                 required: true,
                 message: "Username must be 3-32 characters long and contain only letters and numbers"
