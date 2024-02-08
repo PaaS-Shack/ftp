@@ -143,6 +143,8 @@ module.exports = {
          */
         async createFTPServer() {
 
+            const [privkey, chain, cert] = await this.resolveKeyCert(this.config['ftp.hostname']);
+
             // ftp config
             const ftpConfig = {
                 url: this.config['ftp.url'],
@@ -152,6 +154,11 @@ module.exports = {
                 pasv_max: this.config['ftp.pasv_max'],
                 greeting: this.config['ftp.greeting'],
                 anonymous: this.config['ftp.anonymous'],
+                tls: {
+                    key: privkey,
+                    cert: cert,
+                    ca: chain,
+                }
             };
 
             const ftpServer = new FtpSrv(ftpConfig);
@@ -365,6 +372,42 @@ module.exports = {
             return user.permissions.filter((permission) => {
                 return !permission.startsWith('!');
             })
+        },
+
+
+        /**
+         * resolve key and cert from v1.certificates service
+         * 
+         * @param {String} hostname - hostname to resolve
+         * 
+         * @returns {Promise} 
+         */
+        async resolveKeyCert(hostname) {
+            // resolve key and cert
+            let result = await this.broker.call("v1.certificates.resolveDomain", {
+                domain: hostname
+            });
+
+            // check result
+            if (!result) {
+                await this.broker.call("v1.certificates.letsencrypt.dns", {
+                    domain: hostname
+                });
+                result = await this.broker.call("v1.certificates.resolveDomain", {
+                    domain: hostname
+                });
+            }
+
+            if (!result) {
+                throw new Error('failed to resolve key and cert');
+            }
+
+            this.logger.info(`resolved key and cert for ${hostname}`);
+
+            const { privkey, chain, cert } = result;
+
+            // return key and cert
+            return [privkey, chain, cert];
         },
     },
 
