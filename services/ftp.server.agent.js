@@ -107,7 +107,6 @@ module.exports = {
                 method: 'GET',
                 path: '/connections'
             },
-            permissions: ['ftp.server.connections.list'],
             async handler(ctx) {
                 const params = Object.assign({}, ctx.params);
                 // get connections
@@ -121,6 +120,87 @@ module.exports = {
                         user: connection.user,
                     }
                 });
+            }
+        },
+
+        /**
+         * stop server
+         * 
+         * @actions
+         * 
+         * @returns {Promise} - result
+         */
+        stopServer: {
+            rest: {
+                method: 'POST',
+                path: '/stop'
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+                return this.stopFTPServer();
+            }
+        },
+
+        /**
+         * start server
+         * 
+         * @actions
+         * 
+         * @returns {Promise} - result
+         */
+        startServer: {
+            rest: {
+                method: 'POST',
+                path: '/start'
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+                return this.createFTPServer();
+            }
+        },
+
+        /**
+         * restart server
+         * 
+         * @actions
+         * 
+         * @returns {Promise} - result
+         */
+        restartServer: {
+            rest: {
+                method: 'POST',
+                path: '/restart'
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+                await this.stopFTPServer();
+                return this.createFTPServer();
+            }
+        },
+
+        /**
+         * get server status
+         * 
+         * @actions
+         * 
+         * @returns {Promise} - server status
+         */
+        getServerStatus: {
+            rest: {
+                method: 'GET',
+                path: '/status'
+            },
+            async handler(ctx) {
+                const params = Object.assign({}, ctx.params);
+                return {
+                    status: this.server.listening ? 'running' : 'stopped',
+                    url: this.config['ftp.url'],
+                    pasv_url: this.config['ftp.pasv_url'],
+                    pasv_min: this.config['ftp.pasv_min'],
+                    pasv_max: this.config['ftp.pasv_max'],
+                    greeting: this.config['ftp.greeting'],
+                    anonymous: this.config['ftp.anonymous'],
+                }
             }
         },
     },
@@ -313,7 +393,7 @@ module.exports = {
 
             if (user.driver == 'local') {
                 // create local driver
-                return await this.createLocalFsDriver(connection, user);
+                return this.createLocalFsDriver(connection, user);
             } else if (user.driver == 's3') {
                 // not implemented
                 throw new Error('S3 driver not implemented');
@@ -322,7 +402,7 @@ module.exports = {
                 throw new Error('git driver not implemented');
             } else {
                 // create local driver
-                return await this.createLocalFsDriver(connection, user);
+                return this.createLocalFsDriver(connection, user);
             }
         },
 
